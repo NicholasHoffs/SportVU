@@ -1,4 +1,4 @@
-# SportsVU Analysis
+# SportVU Analysis
 
-This repo holds my SportsVU project.
+This repo holds my SportVU project.
 
