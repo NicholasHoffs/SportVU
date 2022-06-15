@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 import os
 
+import warnings
+warnings.filterwarnings('ignore')
+
 def json_2_csv(game_path):
 
     #LOAD JSON DATA
@@ -57,7 +60,8 @@ def bulk_conversion(games_json_path, save_path):
 
     for filename in os.listdir(games_json_path):
         new_name = filename.replace('.json','.csv')
+        print('Converting ', filename, ' to ', new_name)
         df,game_id = json_2_csv(games_json_path+filename)
         save_DataFrame(df, save_path+game_id+'.csv')
 
-bulk_conversion('./data/json/','./data/csv/')
+bulk_conversion('./data/json/','./data/motion_csv/')
