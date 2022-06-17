@@ -5,10 +5,9 @@ import pandas as pd
 import numpy as np
 import os
 
+def animate_play(df, event_num,figure_save_name, notebook):
 
-def animate_play(game_csv_path, event_num,figure_save_name):
-
-    df=pd.read_csv(game_csv_path)
+    # df=pd.read_csv(game_csv_path)
     df = df[df['EVENT']==event_num]
 
     df['MOMENT_NUM'] = np.divmod(np.arange(len(df)),11)[0]+1
@@ -92,6 +91,7 @@ def animate_play(game_csv_path, event_num,figure_save_name):
             yanchor="top",
             sizing="stretch",
             layer="below")])
-    fig.write_html('./plotly_figures/{}.html'.format(figure_save_name), auto_open=True)
+    return fig
+    # fig.write_html('./plotly_figures/{}.html'.format(figure_save_name), auto_open=True)
 
-animate_play('./data/motion_csv/0021500001.csv', 2, 'first_figure')
+# animate_play('./data/motion_csv/0021500001.csv', 2, 'first_figure')

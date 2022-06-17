@@ -54,7 +54,7 @@ def json_2_csv(game_path):
     return full_df, game_id
 
 def save_DataFrame(DataFrame,file_path):
-    pd.DataFrame.to_csv(DataFrame,file_path)
+    pd.DataFrame.to_csv(DataFrame,file_path,index=False)
 
 def bulk_conversion(games_json_path, save_path):
 
@@ -64,4 +64,30 @@ def bulk_conversion(games_json_path, save_path):
         df,game_id = json_2_csv(games_json_path+filename)
         save_DataFrame(df, save_path+game_id+'.csv')
 
-bulk_conversion('./data/json/','./data/motion_csv/')
+# bulk_conversion('./data/json/','./data/motion_csv/')
+
+def merge_dataframes(motion_path, pbp_path):
+    motion_df = pd.read_csv(motion_path)
+    pbp_df = pd.read_csv(pbp_path)
+
+    pbp_df.rename(columns={'EVENTNUM':'EVENT'}, inplace=True)
+    pbp_df = pbp_df[['EVENT','EVENTMSGTYPE','EVENTMSGACTIONTYPE','PLAYER1_ID']]
+
+    df=pd.merge(motion_df,pbp_df,how='inner',on='EVENT')
+
+    return df
+
+def bulk_merge(motion_paths, pbp_paths):
+    count=1
+    
+    _, _, files = next(os.walk(motion_paths))
+    file_count = len(files)
+    for motion_name in os.listdir(motion_paths):
+        for pbp_name in os.listdir(pbp_paths):
+            if motion_name==pbp_name:
+                print('Merging ', motion_name, '--- {} out of {}'.format(count, file_count))
+                save_DataFrame(merge_dataframes(motion_paths+'/'+motion_name,pbp_paths+'/'+pbp_name),'./data/merged_csv/{}'.format(motion_name))
+                count += 1
+                print('Done.')
+
+bulk_merge('./data/motion_csv','./data/pbp')
