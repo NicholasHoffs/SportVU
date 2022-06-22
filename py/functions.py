@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import os
 
+from court_convert import full_to_half_full, half_full_to_half
+
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -51,6 +53,9 @@ def json_2_csv(game_path):
     #Convert to DataFrame
     full_df=pd.DataFrame(full_df,columns=['EVENT','TEAM_ID','PLAYER_ID','LOC_X','LOC_Y','LOC_Z','GAME_CLOCK','SHOT_CLOCK'])
 
+    full_df = full_to_half_full(full_df)
+    full_df = half_full_to_half(full_df)
+
     return full_df, game_id
 
 def save_DataFrame(DataFrame,file_path):
@@ -71,7 +76,7 @@ def merge_dataframes(motion_path, pbp_path):
     pbp_df = pd.read_csv(pbp_path)
 
     pbp_df.rename(columns={'EVENTNUM':'EVENT'}, inplace=True)
-    pbp_df = pbp_df[['EVENT','EVENTMSGTYPE','EVENTMSGACTIONTYPE','PLAYER1_ID']]
+    pbp_df = pbp_df[['EVENT','EVENTMSGTYPE','EVENTMSGACTIONTYPE','PLAYER1_ID','PLAYER1_NAME','HOMEDESCRIPTION','VISITORDESCRIPTION']]
 
     df=pd.merge(motion_df,pbp_df,how='inner',on='EVENT')
 

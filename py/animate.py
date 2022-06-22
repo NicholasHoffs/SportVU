@@ -5,14 +5,19 @@ import pandas as pd
 import numpy as np
 import os
 
-def animate_play(df, event_num,figure_save_name, notebook):
+from py.movement import velocity, acceleration
+
+def animate_play(df, event_num,figure_save_name):
 
     # df=pd.read_csv(game_csv_path)
     df = df[df['EVENT']==event_num]
 
-    df['MOMENT_NUM'] = np.divmod(np.arange(len(df)),11)[0]+1
+    length = len(df)
 
-    df['LOC_Z'] = df['LOC_Z']+1
+    df.loc[:,'MOMENT_NUM'] = np.divmod(np.arange(length),11)[0]+1
+
+    df.loc[:,'LOC_Z'] = df['LOC_Z']+1
+
 
     player_df = df[df['PLAYER_ID']!=-1]
     ball_df = df[df['PLAYER_ID']==-1]
@@ -29,13 +34,19 @@ def animate_play(df, event_num,figure_save_name, notebook):
         y="LOC_Y",
         animation_frame="MOMENT_NUM",
         animation_group="PLAYER_ID",
-        range_x=(0.0, 100.0),
-        range_y=(0.0, 50.0),
+        range_x=(-250,250),
+        range_y=(-47.5, 422.5),
         hover_data=player_hover_data,
         render_mode="webgl" if webgl else "svg",
         size='LOC_Z',
+        width=625, height=587.5,
         **color_kwargs
     )
+
+    player_fig.update_traces(marker=dict(size=12,
+                              line=dict(width=2,
+                                        color='DarkSlateGrey')),
+                  selector=dict(mode='markers'))
 
     # original code
     ball_fig = px.scatter(
@@ -44,10 +55,11 @@ def animate_play(df, event_num,figure_save_name, notebook):
         y="LOC_Y",
         animation_frame="MOMENT_NUM",
         animation_group="PLAYER_ID",
-        range_x=(0.0, 100.0),
-        range_y=(0.0, 50.0),
+        range_x=(-250,250),
+        range_y=(-47.5, 422.5),
         hover_data=ball_hover_data,
         size='LOC_Z',
+        width=625, height=587.5,
         **color_kwargs
     )
 
@@ -72,26 +84,49 @@ def animate_play(df, event_num,figure_save_name, notebook):
 
     import base64
     #set a local image as a background
-    image_filename = 'index.jpg'
+    image_filename = 'court.png'
     plotly_logo = base64.b64encode(open(image_filename, 'rb').read())
 
     fig.update_layout(
         xaxis = {                                     
-                'showgrid': False
+                'showgrid': False,
+                'showticklabels': False,
+                'visible': False
                 },
         yaxis = {                              
-            'showgrid': True
+                'showgrid': False,
+                'showticklabels': False,
+                'visible': False
                 },                                                                            
         images= [dict(
-            source='data:image/jpg;base64,{}'.format(plotly_logo.decode()),
+            source='data:image/png;base64,{}'.format(plotly_logo.decode()),
             xref="paper", yref="paper",
             x=0, y=1,
             sizex=1, sizey=1,
             xanchor="left",
             yanchor="top",
             sizing="stretch",
-            layer="below")])
+            layer="below")]
+            )
     return fig
     # fig.write_html('./plotly_figures/{}.html'.format(figure_save_name), auto_open=True)
+
+def animate_velocity(df, event_num):
+    df = df[df['EVENT']==event_num]
+
+    vel = velocity(df['LOC_X'], df['LOC_Y'])
+
+    fig = px.line(vel)
+
+    return fig
+
+def animate_acceleration(df, event_num):
+    df = df[df['EVENT']==event_num]
+
+    acc = acceleration(df['LOC_X'], df['LOC_Y'])
+
+    fig = px.line(acc)
+
+    return fig
 
 # animate_play('./data/motion_csv/0021500001.csv', 2, 'first_figure')
