@@ -7,9 +7,8 @@ import os
 
 from py.movement import velocity, acceleration
 
-def animate_play(df, event_num,figure_save_name):
+def animate_play(df, event_num):
 
-    # df=pd.read_csv(game_csv_path)
     df = df[df['EVENT']==event_num]
 
     length = len(df)
@@ -102,31 +101,30 @@ def animate_play(df, event_num,figure_save_name):
             source='data:image/png;base64,{}'.format(plotly_logo.decode()),
             xref="paper", yref="paper",
             x=0, y=1,
-            sizex=1, sizey=1,
             xanchor="left",
+            sizex=1,sizey=1,
             yanchor="top",
             sizing="stretch",
             layer="below")]
             )
     return fig
-    # fig.write_html('./plotly_figures/{}.html'.format(figure_save_name), auto_open=True)
 
 def animate_velocity(df, event_num):
     df = df[df['EVENT']==event_num]
+    df = df[df['PLAYER_ID']==-1]
 
     vel = velocity(df['LOC_X'], df['LOC_Y'])
 
-    fig = px.line(vel)
+    fig = px.line(vel, height=250)
 
     return fig
 
 def animate_acceleration(df, event_num):
     df = df[df['EVENT']==event_num]
+    df = df[df['PLAYER_ID']==-1]
 
     acc = acceleration(df['LOC_X'], df['LOC_Y'])
 
-    fig = px.line(acc)
+    fig = px.line(acc, height=250)
 
     return fig
-
-# animate_play('./data/motion_csv/0021500001.csv', 2, 'first_figure')
